@@ -1,1 +1,558 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+  <title>BMI Calculator – Calculate Your Body Mass Index</title>
+  <meta name="description" content="Calculate your Body Mass Index (BMI) instantly using our free, simple and accurate BMI calculator for adults. Supports metric and imperial units.">
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    :root {
+      --primary: #2563eb;
+      --primary-dark: #1d4ed8;
+      --text: #172033;
+      --muted: #64748b;
+      --background: #f8fafc;
+      --card: #ffffff;
+      --border: #e2e8f0;
+      --success: #16a34a;
+      --warning: #d97706;
+      --danger: #dc2626;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      color: var(--text);
+      background: var(--background);
+      line-height: 1.6;
+    }
+
+    header {
+      background: #ffffff;
+      border-bottom: 1px solid var(--border);
+      padding: 18px 20px;
+    }
+
+    .nav {
+      max-width: 1100px;
+      margin: auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+    }
+
+    .logo {
+      font-size: 1.25rem;
+      font-weight: 800;
+      color: var(--primary);
+    }
+
+    nav a {
+      color: var(--text);
+      text-decoration: none;
+      margin-left: 18px;
+      font-size: 0.95rem;
+    }
+
+    nav a:hover {
+      color: var(--primary);
+    }
+
+    main {
+      max-width: 1100px;
+      margin: auto;
+      padding: 50px 20px 70px;
+    }
+
+    .hero {
+      text-align: center;
+      max-width: 760px;
+      margin: 0 auto 35px;
+    }
+
+    .hero h1 {
+      font-size: clamp(2rem, 5vw, 3.2rem);
+      line-height: 1.15;
+      margin: 0 0 15px;
+    }
+
+    .hero p {
+      color: var(--muted);
+      font-size: 1.05rem;
+      margin: 0;
+    }
+
+    .calculator {
+      max-width: 650px;
+      margin: auto;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 28px;
+      box-shadow: 0 10px 30px rgba(15, 23, 42, 0.06);
+    }
+
+    .unit-switch {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      background: #f1f5f9;
+      border-radius: 10px;
+      padding: 4px;
+      margin-bottom: 25px;
+    }
+
+    .unit-switch button {
+      border: 0;
+      padding: 11px;
+      border-radius: 7px;
+      background: transparent;
+      cursor: pointer;
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--muted);
+    }
+
+    .unit-switch button.active {
+      background: white;
+      color: var(--primary);
+      box-shadow: 0 2px 8px rgba(15, 23, 42, 0.08);
+    }
+
+    .field {
+      margin-bottom: 18px;
+    }
+
+    label {
+      display: block;
+      font-weight: 700;
+      margin-bottom: 7px;
+    }
+
+    input {
+      width: 100%;
+      padding: 13px 14px;
+      border: 1px solid var(--border);
+      border-radius: 9px;
+      font-size: 1rem;
+      outline: none;
+    }
+
+    input:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+    }
+
+    .hint {
+      color: var(--muted);
+      font-size: 0.82rem;
+      margin-top: 5px;
+    }
+
+    .calculate {
+      width: 100%;
+      border: 0;
+      border-radius: 9px;
+      padding: 14px;
+      background: var(--primary);
+      color: white;
+      font-size: 1rem;
+      font-weight: 800;
+      cursor: pointer;
+      margin-top: 5px;
+    }
+
+    .calculate:hover {
+      background: var(--primary-dark);
+    }
+
+    .result {
+      display: none;
+      margin-top: 25px;
+      padding: 22px;
+      border-radius: 12px;
+      background: #eff6ff;
+      text-align: center;
+    }
+
+    .result.show {
+      display: block;
+    }
+
+    .result-label {
+      color: var(--muted);
+      margin-bottom: 3px;
+    }
+
+    .bmi-number {
+      font-size: 3rem;
+      font-weight: 900;
+      color: var(--primary);
+      line-height: 1.1;
+    }
+
+    .category {
+      font-size: 1.15rem;
+      font-weight: 800;
+      margin-top: 5px;
+    }
+
+    .error {
+      display: none;
+      color: var(--danger);
+      background: #fef2f2;
+      border: 1px solid #fecaca;
+      border-radius: 8px;
+      padding: 10px;
+      margin-bottom: 18px;
+      font-size: 0.9rem;
+    }
+
+    .error.show {
+      display: block;
+    }
+
+    .content {
+      max-width: 800px;
+      margin: 55px auto 0;
+    }
+
+    .content h2 {
+      margin-top: 38px;
+      font-size: 1.7rem;
+    }
+
+    .content p,
+    .content li {
+      color: #475569;
+    }
+
+    .bmi-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    .bmi-table th,
+    .bmi-table td {
+      padding: 12px 15px;
+      border-bottom: 1px solid var(--border);
+      text-align: left;
+    }
+
+    .bmi-table th {
+      background: #f1f5f9;
+    }
+
+    footer {
+      border-top: 1px solid var(--border);
+      background: white;
+      text-align: center;
+      padding: 25px 20px;
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+
+    @media (max-width: 650px) {
+      header {
+        padding: 15px;
+      }
+
+      nav {
+        display: none;
+      }
+
+      main {
+        padding: 35px 15px 55px;
+      }
+
+      .calculator {
+        padding: 20px;
+        border-radius: 14px;
+      }
+
+      .hero h1 {
+        font-size: 2.2rem;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+<header>
+  <div class="nav">
+    <div class="logo">BMI Calculator</div>
+
+    <nav aria-label="Main navigation">
+      <a href="#calculator">Calculator</a>
+      <a href="#guide">BMI Guide</a>
+      <a href="#faq">FAQ</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+
+  <section class="hero">
+    <h1>Free BMI Calculator</h1>
+    <p>
+      Calculate your Body Mass Index instantly using your height and weight.
+      Choose metric or imperial units.
+    </p>
+  </section>
+
+  <section class="calculator" id="calculator" aria-label="BMI Calculator">
+
+    <div class="unit-switch" role="tablist" aria-label="Measurement system">
+      <button type="button" id="metricBtn" class="active" onclick="setUnit('metric')">
+        Metric
+      </button>
+
+      <button type="button" id="imperialBtn" onclick="setUnit('imperial')">
+        Imperial
+      </button>
+    </div>
+
+    <div id="error" class="error" role="alert"></div>
+
+    <form id="bmiForm">
+
+      <div class="field">
+        <label for="weight" id="weightLabel">Weight (kg)</label>
+        <input
+          type="number"
+          id="weight"
+          min="1"
+          max="500"
+          step="0.1"
+          placeholder="e.g. 70"
+          required
+        >
+      </div>
+
+      <div class="field">
+        <label for="height" id="heightLabel">Height (cm)</label>
+        <input
+          type="number"
+          id="height"
+          min="50"
+          max="300"
+          step="0.1"
+          placeholder="e.g. 170"
+          required
+        >
+      </div>
+
+      <button class="calculate" type="submit">
+        Calculate BMI
+      </button>
+
+    </form>
+
+    <div class="result" id="result" aria-live="polite">
+      <div class="result-label">Your BMI</div>
+      <div class="bmi-number" id="bmiNumber">--</div>
+      <div class="category" id="category">--</div>
+    </div>
+
+  </section>
+
+  <section class="content" id="guide">
+
+    <h2>What is BMI?</h2>
+
+    <p>
+      Body Mass Index (BMI) is a measurement that uses a person's weight
+      and height to estimate whether their weight falls within a general
+      healthy range. It is commonly used as a screening measure for adults.
+    </p>
+
+    <h2>BMI Categories for Adults</h2>
+
+    <table class="bmi-table">
+      <thead>
+        <tr>
+          <th>BMI</th>
+          <th>Category</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        <tr>
+          <td>Below 18.5</td>
+          <td>Underweight</td>
+        </tr>
+
+        <tr>
+          <td>18.5 – 24.9</td>
+          <td>Healthy weight</td>
+        </tr>
+
+        <tr>
+          <td>25.0 – 29.9</td>
+          <td>Overweight</td>
+        </tr>
+
+        <tr>
+          <td>30.0 or higher</td>
+          <td>Obesity</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <p>
+      BMI is a screening tool and does not directly measure body fat.
+      Factors such as muscle mass, age and other health characteristics
+      should also be considered.
+    </p>
+
+    <h2 id="faq">Frequently Asked Questions</h2>
+
+    <h3>How is BMI calculated?</h3>
+    <p>
+      BMI is calculated by dividing weight in kilograms by height in
+      metres squared.
+    </p>
+
+    <h3>Is BMI the same for men and women?</h3>
+    <p>
+      The standard adult BMI categories are generally applied to both
+      men and women, although BMI does not account for differences in
+      body composition.
+    </p>
+
+    <h3>Can children use this calculator?</h3>
+    <p>
+      Children and teenagers require age- and sex-specific BMI
+      interpretation. This calculator is designed for adults.
+    </p>
+
+  </section>
+
+</main>
+
+<footer>
+  <p>© 2026 BMI Calculator. For informational purposes only.</p>
+</footer>
+
+<script>
+  let unit = "metric";
+
+  const form = document.getElementById("bmiForm");
+  const weight = document.getElementById("weight");
+  const height = document.getElementById("height");
+
+  const weightLabel = document.getElementById("weightLabel");
+  const heightLabel = document.getElementById("heightLabel");
+
+  const metricBtn = document.getElementById("metricBtn");
+  const imperialBtn = document.getElementById("imperialBtn");
+
+  const result = document.getElementById("result");
+  const bmiNumber = document.getElementById("bmiNumber");
+  const category = document.getElementById("category");
+  const error = document.getElementById("error");
+
+  function setUnit(selectedUnit) {
+    unit = selectedUnit;
+
+    result.classList.remove("show");
+    error.classList.remove("show");
+
+    if (unit === "metric") {
+      metricBtn.classList.add("active");
+      imperialBtn.classList.remove("active");
+
+      weightLabel.textContent = "Weight (kg)";
+      heightLabel.textContent = "Height (cm)";
+
+      weight.placeholder = "e.g. 70";
+      height.placeholder = "e.g. 170";
+
+      weight.min = "1";
+      weight.max = "500";
+      height.min = "50";
+      height.max = "300";
+
+    } else {
+      imperialBtn.classList.add("active");
+      metricBtn.classList.remove("active");
+
+      weightLabel.textContent = "Weight (lb)";
+      heightLabel.textContent = "Height (inches)";
+
+      weight.placeholder = "e.g. 154";
+      height.placeholder = "e.g. 67";
+
+      weight.min = "2";
+      weight.max = "1100";
+      height.min = "20";
+      height.max = "120";
+    }
+  }
+
+  form.addEventListener("submit", function(event) {
+    event.preventDefault();
+
+    error.classList.remove("show");
+
+    const weightValue = Number(weight.value);
+    const heightValue = Number(height.value);
+
+    if (!weightValue || !heightValue || weightValue <= 0 || heightValue <= 0) {
+      showError("Please enter a valid weight and height.");
+      return;
+    }
+
+    let bmi;
+
+    if (unit === "metric") {
+      const heightMeters = heightValue / 100;
+      bmi = weightValue / (heightMeters * heightMeters);
+    } else {
+      bmi = (weightValue / (heightValue * heightValue)) * 703;
+    }
+
+    bmi = Math.round(bmi * 10) / 10;
+
+    let bmiCategory;
+
+    if (bmi < 18.5) {
+      bmiCategory = "Underweight";
+    } else if (bmi < 25) {
+      bmiCategory = "Healthy weight";
+    } else if (bmi < 30) {
+      bmiCategory = "Overweight";
+    } else {
+      bmiCategory = "Obesity";
+    }
+
+    bmiNumber.textContent = bmi;
+    category.textContent = bmiCategory;
+
+    result.classList.add("show");
+  });
+
+  function showError(message) {
+    error.textContent = message;
+    error.classList.add("show");
+  }
+</script>
+
+</body>
+</html>
