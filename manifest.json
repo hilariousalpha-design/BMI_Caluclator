@@ -1,0 +1,10 @@
+{
+  "name": "Free BMI Calculator",
+  "short_name": "BMI Calculator",
+  "description": "Free BMI calculator with healthy weight range and private history.",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#f6f9fd",
+  "theme_color": "#2563eb",
+  "icons": []
+}
